@@ -5,7 +5,7 @@
 namespace DataMangler.Pickers;
 
 using Core;
-using DataLoader.DTO;
+using DataLoader.Records;
 
 /// <summary>
 /// Picker Close from Ohlcv.

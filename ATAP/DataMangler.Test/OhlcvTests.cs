@@ -5,7 +5,8 @@
 namespace DataMangler.Test;
 
 using Core;
-using DataLoader.DTO;
+using DataLoader;
+using DataLoader.Records;
 using DataLoader.Test;
 using DataMangler.Pickers;
 using Xunit.Abstractions;
@@ -37,46 +38,55 @@ public class OhlcvTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData(65152)]
+    [InlineData(959)]
     public void TestTimeSeriesFromFileNullCount(int expectedNulls)
     {
-        NullableTimeSeries ts = this.GetNullableTimeSeriesOfFileCloses();
-        int actualNulls = ts.NullCount();
-        output.WriteLine($"{actualNulls.WithCommas()} out of {ts.Values.Count.WithCommas()} are null.");
+        var ts = this.GetNullableTimeSeriesOfFileCloses();
+        int actualNulls = ts.Select(t => t.NullCount()).Max();
+        //output.WriteLine($"{actualNulls.WithCommas()} out of {ts.Values.Count.WithCommas()} are null.");
         Assert.Equal(expectedNulls, actualNulls);
     }
 
-    private static NullableTimeSeries GetNullableTimeSeriesOfCloses(List<Ohlcv> dtos)
+    [Fact]
+
+    public void TestOhlcvGroupBySnippet()
+    {
+        RecordContainer<Ohlcv> stdDtos = this.GetSnippetAsStandardDtos();
+        IReadOnlyList<RecordContainerWithUniqueSymbol<Ohlcv>> groupBy = UniqueRecordContainerFactory.Create(stdDtos);
+    }
+
+    private static NullableTimeSeries GetNullableTimeSeriesOfCloses(RecordContainerWithUniqueSymbol<Ohlcv> dtos)
     {
         var picker = new OhlcvClosePicker();
         var ts = TimeSeriesFactory.Create("TestClosingTimeSeries", dtos, picker);
         return ts;
     }
 
-    private TimeSeries GetTimeSeriesOfFileCloses()
+    private List<TimeSeries> GetTimeSeriesOfFileCloses()
     {
-        var ts = this.GetNullableTimeSeriesOfFileCloses().ToTimeSeries();
+        List<TimeSeries> ts = [..this.GetNullableTimeSeriesOfFileCloses().Select(t => t.ToTimeSeries())];
         return ts;
     }
 
-    private NullableTimeSeries GetNullableTimeSeriesOfFileCloses()
+    private IReadOnlyList<NullableTimeSeries> GetNullableTimeSeriesOfFileCloses()
     {
-        var ts = GetNullableTimeSeriesOfCloses(this.GetFileAsStandardDtos());
-        return ts;
+        IReadOnlyList<RecordContainerWithUniqueSymbol<Ohlcv>> groupBy = UniqueRecordContainerFactory.Create(this.GetFileAsStandardDtos());
+        return [.. groupBy.Select(g => GetNullableTimeSeriesOfCloses(g))];
     }
 
-    private NullableTimeSeries GetNullableTimeSeriesOfSnippetCloses()
+    private IReadOnlyList<NullableTimeSeries> GetNullableTimeSeriesOfSnippetCloses()
     {
-        return GetNullableTimeSeriesOfCloses(this.GetSnippetAsStandardDtos());
+        IReadOnlyList<RecordContainerWithUniqueSymbol<Ohlcv>> groupBy = UniqueRecordContainerFactory.Create(this.GetSnippetAsStandardDtos());
+        return [.. groupBy.Select(g => GetNullableTimeSeriesOfCloses(g))];
     }
 
-    private List<Ohlcv> GetSnippetAsStandardDtos()
+    private RecordContainer<Ohlcv> GetSnippetAsStandardDtos()
     {
         DataBentoTest dbt = new(output);
         return dbt.ConvertToStandardDtosSnippet();
     }
 
-    private List<Ohlcv> GetFileAsStandardDtos()
+    private RecordContainer<Ohlcv> GetFileAsStandardDtos()
     {
         DataBentoTest dbt = new(output);
         return dbt.ConvertToStandardDtosFile();

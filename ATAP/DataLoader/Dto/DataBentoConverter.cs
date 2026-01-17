@@ -2,9 +2,9 @@
 // Copyright (c) LarissaStupar1974. All rights reserved.
 // </copyright>
 
-namespace DataLoader.Dto.InputDto;
+namespace DataLoader.Dto;
 
-using DataLoader.DTO;
+using DataLoader.Records;
 
 /// <summary>
 /// Convert from DataBento to standard schema.

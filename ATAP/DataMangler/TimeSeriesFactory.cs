@@ -5,7 +5,7 @@
 namespace DataMangler;
 
 using Core;
-using DataLoader.DTO;
+using DataLoader.Records;
 using DataMangler.Pickers;
 
 /// <summary>
@@ -20,9 +20,10 @@ public class TimeSeriesFactory
     /// <param name="ohlcvs">Raw ohlcv list.</param>
     /// <param name="picker">Field picker.</param>
     /// <returns>Nullable timeseries.</returns>
-    public static NullableTimeSeries Create(string name, IReadOnlyList<Ohlcv> ohlcvs, IPicker<Ohlcv> picker)
+    public static NullableTimeSeries Create(string name, RecordContainerWithUniqueSymbol<Ohlcv> ohlcvs, IPicker<Ohlcv> picker)
     {
-        List<NullableDataPoint> points = [..ohlcvs.Select(picker.GetValue)];
+
+        List<NullableDataPoint> points = [..ohlcvs.Records.Select(picker.GetValue)];
         return new NullableTimeSeries(name, points);
     }
 }

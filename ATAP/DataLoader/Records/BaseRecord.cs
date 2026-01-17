@@ -2,7 +2,7 @@
 // Copyright (c) LarissaStupar1974. All rights reserved.
 // </copyright>
 
-namespace DataLoader.Dto;
+namespace DataLoader.Records;
 
 public record BaseRecord
 {
