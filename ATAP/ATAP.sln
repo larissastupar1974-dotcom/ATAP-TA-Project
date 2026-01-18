@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataMangler", "DataMangler\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataMangler.Test", "DataMangler.Test\DataMangler.Test.csproj", "{5A0F2533-09E1-4849-96BF-906D09DC4261}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalGenerator", "SignalGenerator\SignalGenerator.csproj", "{3ACD401E-55FB-4AE4-BF09-FB6708DAF942}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalGenerator.Test", "SignalGenerator.Test\SignalGenerator.Test.csproj", "{101226FB-1EAF-43DE-B92C-DB56C4F94A45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{5A0F2533-09E1-4849-96BF-906D09DC4261}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A0F2533-09E1-4849-96BF-906D09DC4261}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A0F2533-09E1-4849-96BF-906D09DC4261}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3ACD401E-55FB-4AE4-BF09-FB6708DAF942}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3ACD401E-55FB-4AE4-BF09-FB6708DAF942}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3ACD401E-55FB-4AE4-BF09-FB6708DAF942}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3ACD401E-55FB-4AE4-BF09-FB6708DAF942}.Release|Any CPU.Build.0 = Release|Any CPU
+		{101226FB-1EAF-43DE-B92C-DB56C4F94A45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{101226FB-1EAF-43DE-B92C-DB56C4F94A45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{101226FB-1EAF-43DE-B92C-DB56C4F94A45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{101226FB-1EAF-43DE-B92C-DB56C4F94A45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

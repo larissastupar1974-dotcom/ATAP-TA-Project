@@ -72,7 +72,7 @@ public class OhlcvTests(ITestOutputHelper output)
         Assert.Equal(expectedName, longest.Name);
     }
 
-    private TimeSeries GetLongestTimeSeries()
+    public TimeSeries GetLongestTimeSeries()
     {
         IReadOnlyList<NullableTimeSeries> nts = this.GetNullableTimeSeriesOfFileCloses();
         IReadOnlyList<TimeSeries> ts = [.. nts.Select(t => t.ToTimeSeries())];

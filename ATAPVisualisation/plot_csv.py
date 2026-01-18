@@ -16,12 +16,12 @@ df = df.groupby("TimeStamp", as_index=False)["Value"].mean()
 
 # Create the plot
 plt.figure(figsize=(12, 6))
-plt.plot(df["TimeStamp"], df["Value"], marker="o", linestyle="-")
-
+# plt.plot(df["TimeStamp"], df["Value"], marker="o", linestyle="-")
+plt.plot(df["TimeStamp"], df["Value"], linestyle="-")
 # Labels and title
 plt.xlabel("Time")
-plt.ylabel("Value")
-plt.title("Value Over Time")
+plt.ylabel("Closing Price")
+plt.title("TFM FYF0026.Z0026")
 
 # Improve readability
 plt.grid(True)

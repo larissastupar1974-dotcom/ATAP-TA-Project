@@ -35,10 +35,8 @@ public static class CsvReaderWriter
     public static void SaveToCSV<T>(IReadOnlyList<T> records)
     {
 
-        using (var writer = new StreamWriter("C:\\MyData\\file.csv"))
-        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-        {
-            csv.WriteRecords(records);
-        }
+        using var writer = new StreamWriter("C:\\MyData\\file.csv");
+        using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+        csv.WriteRecords(records);
     }
 }
