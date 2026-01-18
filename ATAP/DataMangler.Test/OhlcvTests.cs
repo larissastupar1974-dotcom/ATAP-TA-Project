@@ -39,12 +39,66 @@ public class OhlcvTests(ITestOutputHelper output)
 
     [Theory]
     [InlineData(959)]
-    public void TestTimeSeriesFromFileNullCount(int expectedNulls)
+    public void TestNullableTimeSeriesFromFileNullCount(int expectedNulls)
     {
-        var ts = this.GetNullableTimeSeriesOfFileCloses();
+        IReadOnlyList<NullableTimeSeries> ts = this.GetNullableTimeSeriesOfFileCloses();
         int actualNulls = ts.Select(t => t.NullCount()).Max();
         //output.WriteLine($"{actualNulls.WithCommas()} out of {ts.Values.Count.WithCommas()} are null.");
         Assert.Equal(expectedNulls, actualNulls);
+    }
+
+    [Theory]
+    [InlineData(959)]
+    public void TestNullableTimeSeriesFromSnippetNullCount(int expectedNulls)
+    {
+        throw new NotImplementedException();
+    }
+
+    [Theory]
+    [InlineData(1307)]
+    public void TestTimeSeriesFromFile(int expectedNumber)
+    {
+        IReadOnlyList<NullableTimeSeries> nts = this.GetNullableTimeSeriesOfFileCloses();
+        IReadOnlyList<TimeSeries> ts = [.. nts.Select(t => t.ToTimeSeries())];
+        Assert.Equal(expectedNumber, ts.Count);
+    }
+
+    [Theory]
+    [InlineData(1667, "TFM FYF0026.Z0026")]
+    public void TestGetLongestTimeSeriesFromFile(int expectedNumber, string expectedName)
+    {
+        TimeSeries longest = this.GetLongestTimeSeries();
+        Assert.Equal(expectedNumber, longest.Values.Count);
+        Assert.Equal(expectedName, longest.Name);
+    }
+
+    private TimeSeries GetLongestTimeSeries()
+    {
+        IReadOnlyList<NullableTimeSeries> nts = this.GetNullableTimeSeriesOfFileCloses();
+        IReadOnlyList<TimeSeries> ts = [.. nts.Select(t => t.ToTimeSeries())];
+        TimeSeries longest = ts.OrderByDescending(t => t.Values.Count).First();
+        return longest;
+    }
+
+    [Fact]
+    public void TestWriteLongestTimeSeriesFromFileToCsv()
+    {
+        CsvReaderWriter.SaveToCSV<DataPoint>(this.GetLongestTimeSeries().Values);
+    }
+
+    [Theory]
+    [InlineData(1307)]
+    public void TestGetLongestTimeSeriesFromSnippet(int expectedNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+
+    [Theory]
+    [InlineData(959)]
+    public void TestTimeSeriesFromSnippet(int expectedNulls)
+    {
+        throw new NotImplementedException();
     }
 
     [Fact]
@@ -55,10 +109,18 @@ public class OhlcvTests(ITestOutputHelper output)
         IReadOnlyList<RecordContainerWithUniqueSymbol<Ohlcv>> groupBy = UniqueRecordContainerFactory.Create(stdDtos);
     }
 
+    [Fact]
+
+    public void TestOhlcvGroupByFile()
+    {
+        RecordContainer<Ohlcv> stdDtos = this.GetFileAsStandardDtos();
+        IReadOnlyList<RecordContainerWithUniqueSymbol<Ohlcv>> groupBy = UniqueRecordContainerFactory.Create(stdDtos);
+    }
+
     private static NullableTimeSeries GetNullableTimeSeriesOfCloses(RecordContainerWithUniqueSymbol<Ohlcv> dtos)
     {
         var picker = new OhlcvClosePicker();
-        var ts = TimeSeriesFactory.Create("TestClosingTimeSeries", dtos, picker);
+        var ts = TimeSeriesFactory.Create(dtos.Symbol, dtos, picker);
         return ts;
     }
 

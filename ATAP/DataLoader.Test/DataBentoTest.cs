@@ -142,7 +142,7 @@ public class DataBentoTest(ITestOutputHelper output)
     internal static bool TryGetRecordsFromAbsoluteFilePath(string filePath, out DtoContainer<DataBentoOhlcv>? records)
     {
         bool exists = File.Exists(filePath);
-        records = exists ? ReadCsv.ReadDataBentoOhlcv(filePath) : null;
+        records = exists ? CsvReaderWriter.ReadDataBentoOhlcv(filePath) : null;
         return exists;
     }
 
