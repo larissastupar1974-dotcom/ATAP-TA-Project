@@ -4,9 +4,4 @@
 
 namespace Core;
 
-/// <summary>
-/// Time and value.
-/// </summary>
-/// <param name="TimeStamp">Time stamp.</param>
-/// <param name="Value">Value.</param>
-public record DataPoint(DateTime TimeStamp, double Value);
+public record DataPoint<T>(DateTime TimeStamp, T Value);

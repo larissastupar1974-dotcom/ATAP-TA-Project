@@ -6,6 +6,7 @@ namespace DataMangler;
 
 using Core;
 using DataLoader.Records;
+using DataMangler.Distincters;
 using DataMangler.Pickers;
 
 /// <summary>
@@ -20,10 +21,10 @@ public class TimeSeriesFactory
     /// <param name="ohlcvs">Raw ohlcv list.</param>
     /// <param name="picker">Field picker.</param>
     /// <returns>Nullable timeseries.</returns>
-    public static NullableTimeSeries Create(string name, RecordContainerWithUniqueSymbol<Ohlcv> ohlcvs, IPicker<Ohlcv> picker)
+    public static TimeSeries<double?> Create(string name, RecordContainerWithUniqueSymbol<Ohlcv> ohlcvs, IPicker<Ohlcv> picker, IDistincter<double?> distincter)
     {
-
-        List<NullableDataPoint> points = [..ohlcvs.Records.Select(picker.GetValue)];
-        return new NullableTimeSeries(name, points);
+        List<DataPoint<double?>> rawPoints = [..ohlcvs.Records.Select(picker.GetValue)];
+        var points = distincter.MakeDistinct(rawPoints);
+        return new(name, points);
     }
 }

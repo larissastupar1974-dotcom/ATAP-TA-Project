@@ -8,6 +8,7 @@ using Core;
 using DataLoader;
 using DataLoader.Records;
 using DataLoader.Test;
+using DataMangler.Distincters;
 using DataMangler.Pickers;
 using Xunit.Abstractions;
 
@@ -41,7 +42,7 @@ public class OhlcvTests(ITestOutputHelper output)
     [InlineData(959)]
     public void TestNullableTimeSeriesFromFileNullCount(int expectedNulls)
     {
-        IReadOnlyList<NullableTimeSeries> ts = this.GetNullableTimeSeriesOfFileCloses();
+        IReadOnlyList<TimeSeries<double?>> ts = this.GetNullableTimeSeriesOfFileCloses();
         int actualNulls = ts.Select(t => t.NullCount()).Max();
         //output.WriteLine($"{actualNulls.WithCommas()} out of {ts.Values.Count.WithCommas()} are null.");
         Assert.Equal(expectedNulls, actualNulls);
@@ -58,32 +59,32 @@ public class OhlcvTests(ITestOutputHelper output)
     [InlineData(1307)]
     public void TestTimeSeriesFromFile(int expectedNumber)
     {
-        IReadOnlyList<NullableTimeSeries> nts = this.GetNullableTimeSeriesOfFileCloses();
-        IReadOnlyList<TimeSeries> ts = [.. nts.Select(t => t.ToTimeSeries())];
+        IReadOnlyList<TimeSeries<double?>> nts = this.GetNullableTimeSeriesOfFileCloses();
+        IReadOnlyList<TimeSeries<double>> ts = [.. nts.Select(t => t.ToTimeSeries())];
         Assert.Equal(expectedNumber, ts.Count);
     }
 
     [Theory]
-    [InlineData(1667, "TFM FYF0026.Z0026")]
+    [InlineData(1039, "TFM FYF0026.Z0026")]
     public void TestGetLongestTimeSeriesFromFile(int expectedNumber, string expectedName)
     {
-        TimeSeries longest = this.GetLongestTimeSeries();
+        TimeSeries<double> longest = this.GetLongestTimeSeries();
         Assert.Equal(expectedNumber, longest.Values.Count);
         Assert.Equal(expectedName, longest.Name);
     }
 
-    public TimeSeries GetLongestTimeSeries()
+    public TimeSeries<double> GetLongestTimeSeries()
     {
-        IReadOnlyList<NullableTimeSeries> nts = this.GetNullableTimeSeriesOfFileCloses();
-        IReadOnlyList<TimeSeries> ts = [.. nts.Select(t => t.ToTimeSeries())];
-        TimeSeries longest = ts.OrderByDescending(t => t.Values.Count).First();
+        IReadOnlyList<TimeSeries<double?>> nts = this.GetNullableTimeSeriesOfFileCloses();
+        IReadOnlyList<TimeSeries<double>> ts = [.. nts.Select(t => t.ToTimeSeries())];
+        TimeSeries<double> longest = ts.OrderByDescending(t => t.Values.Count).First();
         return longest;
     }
 
     [Fact]
     public void TestWriteLongestTimeSeriesFromFileToCsv()
     {
-        CsvReaderWriter.SaveToCSV<DataPoint>(this.GetLongestTimeSeries().Values);
+        CsvReaderWriter.SaveToCSV<DataPoint<double>>(this.GetLongestTimeSeries().Values, "C:\\MyData\\file.csv");
     }
 
     [Theory]
@@ -117,26 +118,26 @@ public class OhlcvTests(ITestOutputHelper output)
         IReadOnlyList<RecordContainerWithUniqueSymbol<Ohlcv>> groupBy = UniqueRecordContainerFactory.Create(stdDtos);
     }
 
-    private static NullableTimeSeries GetNullableTimeSeriesOfCloses(RecordContainerWithUniqueSymbol<Ohlcv> dtos)
+    private static TimeSeries<double?> GetNullableTimeSeriesOfCloses(RecordContainerWithUniqueSymbol<Ohlcv> dtos)
     {
         var picker = new OhlcvClosePicker();
-        var ts = TimeSeriesFactory.Create(dtos.Symbol, dtos, picker);
+        var ts = TimeSeriesFactory.Create(dtos.Symbol, dtos, picker, new TakeFirst<double?>());
         return ts;
     }
 
-    private List<TimeSeries> GetTimeSeriesOfFileCloses()
+    private List<TimeSeries<double>> GetTimeSeriesOfFileCloses()
     {
-        List<TimeSeries> ts = [..this.GetNullableTimeSeriesOfFileCloses().Select(t => t.ToTimeSeries())];
+        List<TimeSeries<double>> ts = [..this.GetNullableTimeSeriesOfFileCloses().Select(t => t.ToTimeSeries())];
         return ts;
     }
 
-    private IReadOnlyList<NullableTimeSeries> GetNullableTimeSeriesOfFileCloses()
+    private IReadOnlyList<TimeSeries<double?>> GetNullableTimeSeriesOfFileCloses()
     {
         IReadOnlyList<RecordContainerWithUniqueSymbol<Ohlcv>> groupBy = UniqueRecordContainerFactory.Create(this.GetFileAsStandardDtos());
         return [.. groupBy.Select(g => GetNullableTimeSeriesOfCloses(g))];
     }
 
-    private IReadOnlyList<NullableTimeSeries> GetNullableTimeSeriesOfSnippetCloses()
+    private IReadOnlyList<TimeSeries<double?>> GetNullableTimeSeriesOfSnippetCloses()
     {
         IReadOnlyList<RecordContainerWithUniqueSymbol<Ohlcv>> groupBy = UniqueRecordContainerFactory.Create(this.GetSnippetAsStandardDtos());
         return [.. groupBy.Select(g => GetNullableTimeSeriesOfCloses(g))];

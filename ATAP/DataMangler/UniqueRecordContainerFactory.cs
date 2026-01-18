@@ -1,4 +1,8 @@
-﻿using DataLoader.Records;
+﻿// <copyright file="UniqueRecordContainerFactory.cs" company="LarissaStupar1974">
+// Copyright (c) LarissaStupar1974. All rights reserved.
+// </copyright>
+
+using DataLoader.Records;
 
 
 namespace DataMangler;

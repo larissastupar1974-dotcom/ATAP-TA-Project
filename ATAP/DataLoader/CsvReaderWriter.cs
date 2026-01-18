@@ -32,10 +32,10 @@ public static class CsvReaderWriter
     // Posted by msmolcic, modified by community. See post 'Timeline' for change history
     // Retrieved 2026-01-18, License - CC BY-SA 4.0
 
-    public static void SaveToCSV<T>(IReadOnlyList<T> records)
+    public static void SaveToCSV<T>(IReadOnlyList<T> records, string filePath)
     {
 
-        using var writer = new StreamWriter("C:\\MyData\\file.csv");
+        using var writer = new StreamWriter(filePath);
         using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
         csv.WriteRecords(records);
     }

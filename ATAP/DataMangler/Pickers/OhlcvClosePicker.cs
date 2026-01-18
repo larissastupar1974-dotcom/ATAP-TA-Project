@@ -13,7 +13,7 @@ using DataLoader.Records;
 public class OhlcvClosePicker : IPicker<Ohlcv>
 {
     /// <inheritdoc/>
-    public NullableDataPoint GetValue(Ohlcv rawValue)
+    public DataPoint<double?> GetValue(Ohlcv rawValue)
     {
         return new(rawValue.TimeStamp, rawValue.Close);
     }

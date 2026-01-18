@@ -17,5 +17,5 @@ public interface IPicker<T>
     /// </summary>
     /// <param name="rawValue">Raw Values.</param>
     /// <returns>Nullable Data Point.</returns>
-    NullableDataPoint GetValue(T rawValue);
+    DataPoint<double?> GetValue(T rawValue);
 }

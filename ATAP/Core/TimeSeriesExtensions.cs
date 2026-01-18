@@ -14,14 +14,14 @@ public static class TimeSeriesExtensions
     /// </summary>
     /// <param name="nullableTimeSeries">NullbleTimeSeries.</param>
     /// <returns>TimeSeries.</returns>
-    public static TimeSeries ToTimeSeries(this NullableTimeSeries nullableTimeSeries)
+    public static TimeSeries<double> ToTimeSeries(this TimeSeries<double?> nullableTimeSeries)
     {
-        List<DataPoint> dataPoints = [];
-        foreach (NullableDataPoint? d in nullableTimeSeries.Values)
+        List<DataPoint<double>> dataPoints = [];
+        foreach (DataPoint<double?> d in nullableTimeSeries.Values)
         {
             if (d.Value != null)
             {
-                DataPoint dataPoint = new(d.TimeStamp, d.Value.Value);
+                DataPoint<double> dataPoint = new(d.TimeStamp, d.Value.Value);
                 dataPoints.Add(dataPoint);
             }
         }
@@ -34,7 +34,7 @@ public static class TimeSeriesExtensions
     /// </summary>
     /// <param name="nullableTimeSeries">Nullable time series.</param>
     /// <returns>TimeStamps of null datapoints.</returns>
-    public static IReadOnlyList<DateTime> GetNulls(this NullableTimeSeries nullableTimeSeries)
+    public static IReadOnlyList<DateTime> GetNulls(this TimeSeries<double?> nullableTimeSeries)
     {
         return [..nullableTimeSeries.Values.Where(v => v.Value == null).Select(s => s.TimeStamp)];
     }
@@ -44,8 +44,24 @@ public static class TimeSeriesExtensions
     /// </summary>
     /// <param name="nullableTimeSeries">Nullable time series.</param>
     /// <returns>Number of null data points.</returns>
-    public static int NullCount(this NullableTimeSeries nullableTimeSeries)
+    public static int NullCount(this TimeSeries<double?> nullableTimeSeries)
     {
         return nullableTimeSeries.Values.Where(v => v.Value == null).Count();
+    }
+
+    public static IReadOnlyList<DateTime> GetDistinctTimeStamps<T>(this List<DataPoint<T>> rawDataPoints)
+    {
+        return [.. rawDataPoints.Select(r => r.TimeStamp).Distinct().Order()];
+    }
+
+    public static IReadOnlyDictionary<DateTime, T> ToDictionary<T>(this TimeSeries<T> timeSeries)
+    {
+        return timeSeries.Values.ToDictionary(t => t.TimeStamp, t => t.Value);
+    }
+
+    public static T? GetValueOrNull<T>(this IReadOnlyDictionary<DateTime, T> dictionary, DateTime timeStamp)
+    {
+        dictionary.TryGetValue(timeStamp, out T? value);
+        return value;
     }
 }

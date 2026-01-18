@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataMangler.Test\DataMangler.Test.csproj" />
+    <ProjectReference Include="..\SignalGenerator\SignalGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>
