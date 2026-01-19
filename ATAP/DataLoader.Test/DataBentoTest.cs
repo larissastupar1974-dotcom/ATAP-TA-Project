@@ -18,6 +18,7 @@ using DataLoader.Records;
 public class DataBentoTest(ITestOutputHelper output)
 {
     private const string FilePath = @"C:\\MyData\Tfm1Yearohlcv-1d.csv";
+    private const string FilePathAsBasicOhlcv = @"C:\\MyData\Book4.csv";
     private const string SnippetPath = @"C:\\MyData\ohlcv-snippet.csv";
     private const string SnippetFileName = "ohlcv-snippet.csv";
 
@@ -26,7 +27,7 @@ public class DataBentoTest(ITestOutputHelper output)
     /// </summary>
     /// <exception cref="Exception">Failed to load.</exception>
     [Fact]
-    public void TestConvertSnippetToStandardDtos()
+    public void TestConvertDataBentoOhlcvSnippetToStandardDtos()
     {
         this.ConvertToStandardDtosSnippet();
     }
@@ -38,7 +39,7 @@ public class DataBentoTest(ITestOutputHelper output)
     [Fact]
     public void TestConvertToStandardDtos()
     {
-         _= this.ConvertToStandardDtos(FilePath);
+         _ = this.ConvertDataBentoOhlcvToStandardDtos(FilePath);
     }
 
     /// <summary>
@@ -47,7 +48,7 @@ public class DataBentoTest(ITestOutputHelper output)
     [Fact]
     public void TestReadFileSnippet()
     {
-        Assert.True(TryGetRecordsFromAbsoluteFilePath(SnippetPath, out _));
+        Assert.True(TryGetRecordsFromAbsoluteFilePath<DataBentoOhlcv>(SnippetPath, out _));
     }
 
     /// <summary>
@@ -58,9 +59,25 @@ public class DataBentoTest(ITestOutputHelper output)
     [Theory]
     [InlineData(SnippetPath, 3)]
     [InlineData(FilePath, 228747)]
-    public void TestReadFileAbsolutePath(string filePath, int expectedNumberOfRecords)
+    public void TestReadDataBentoOhlcvFileAbsolutePath(string filePath, int expectedNumberOfRecords)
     {
-        this.TestRecordNumberInFile(filePath, expectedNumberOfRecords);
+        this.TestRecordNumberInFileData<DataBentoOhlcv>(filePath, expectedNumberOfRecords);
+    }
+
+    [Theory]
+    [InlineData(FilePathAsBasicOhlcv, 1685)]
+    public void TestReadDataBasicOhlcvFileAbsolutePath(string filePath, int expectedNumberOfRecords)
+    {
+        this.TestRecordNumberInFileData<BasicOhlcv>(filePath, expectedNumberOfRecords);
+    }
+
+    [Fact]
+    public void TestWriteFileAbsolutePathLongestSymbolLengthToBasicOhlcv()
+    {
+        RecordContainer<Ohlcv> allOhclv = this.ConvertDataBentoOhlcvToStandardDtos(FilePath);
+        IReadOnlyList<Ohlcv> longest = [..allOhclv.Dtos.GroupBy(d => d.Symbol).OrderBy(e => e.ToList().Count).Last()];
+        IReadOnlyList<BasicOhlcv> asBasic = [..longest.Select(DtoConverter.ConvertOhlcv)];
+        CsvReaderWriter.SaveToCSV(asBasic, FilePathAsBasicOhlcv);
     }
 
     /// <summary>
@@ -73,7 +90,7 @@ public class DataBentoTest(ITestOutputHelper output)
     public void TestRecordNumberInRelativeFile(string fileName, int expectedNumberOfRecords)
     {
         string filePath = GetAbsoluteFilePath(fileName);
-        this.TestRecordNumberInFile(filePath, expectedNumberOfRecords);
+        this.TestRecordNumberInFileData< DataBentoOhlcv>(filePath, expectedNumberOfRecords);
     }
 
     /// <summary>
@@ -82,7 +99,7 @@ public class DataBentoTest(ITestOutputHelper output)
     [Fact]
     public void MissingFileTest()
     {
-        this.TestRecordNumberInFile("missingFile", 37);
+        this.TestRecordNumberInFileData<DataBentoOhlcv>("missingFile", 37);
     }
 
     /// <summary>
@@ -94,7 +111,7 @@ public class DataBentoTest(ITestOutputHelper output)
         string filePath = GetAbsoluteFilePath(SnippetFileName);
         try
         {
-            this.TestRecordNumberInFile(filePath, 37);
+            this.TestRecordNumberInFileData<DataBentoOhlcv>(filePath, 37);
         }
         catch (Xunit.Sdk.EqualException ex)
         {
@@ -109,7 +126,7 @@ public class DataBentoTest(ITestOutputHelper output)
     /// <returns>List of ohlcv.</returns>
     public RecordContainer<Ohlcv> ConvertToStandardDtosSnippet()
     {
-        return this.ConvertToStandardDtos(GetAbsoluteFilePath(SnippetFileName));
+        return this.ConvertDataBentoOhlcvToStandardDtos(GetAbsoluteFilePath(SnippetFileName));
     }
 
     /// <summary>
@@ -118,7 +135,7 @@ public class DataBentoTest(ITestOutputHelper output)
     /// <returns>List of ohlcv.</returns>
     public RecordContainer<Ohlcv> ConvertToStandardDtosFile()
     {
-        return this.ConvertToStandardDtos(FilePath);
+        return this.ConvertDataBentoOhlcvToStandardDtos(FilePath);
     }
 
     /// <summary>
@@ -139,10 +156,10 @@ public class DataBentoTest(ITestOutputHelper output)
     /// <param name="filePath">FilePath.</param>
     /// <param name="records">output records.</param>
     /// <returns>File exists or not.</returns>
-    internal static bool TryGetRecordsFromAbsoluteFilePath(string filePath, out DtoContainer<DataBentoOhlcv>? records)
+    internal static bool TryGetRecordsFromAbsoluteFilePath<T>(string filePath, out DtoContainer<T>? records)
     {
         bool exists = File.Exists(filePath);
-        records = exists ? CsvReaderWriter.ReadDataBentoOhlcv(filePath) : null;
+        records = exists ? CsvReaderWriter.ReadData<T>(filePath) : null;
         return exists;
     }
 
@@ -151,9 +168,9 @@ public class DataBentoTest(ITestOutputHelper output)
     /// </summary>
     /// <param name="filePath">Filepath.</param>
     /// <param name="expectedNumberOfRecords">Expected number of records.</param>
-    internal void TestRecordNumberInFile(string filePath, int expectedNumberOfRecords)
+    internal void TestRecordNumberInFileData<T>(string filePath, int expectedNumberOfRecords)
     {
-        if (TryGetRecordsFromAbsoluteFilePath(filePath, out DtoContainer<DataBentoOhlcv>? records) && records != null)
+        if (TryGetRecordsFromAbsoluteFilePath(filePath, out DtoContainer<T>? records) && records != null)
         {
             output.WriteLine($"File {filePath} has been found.");
             Assert.Equal(expectedNumberOfRecords, records.Dtos.Count);
@@ -164,12 +181,12 @@ public class DataBentoTest(ITestOutputHelper output)
         }
     }
 
-    private RecordContainer<Ohlcv> ConvertToStandardDtos(string filePath)
+    private RecordContainer<Ohlcv> ConvertDataBentoOhlcvToStandardDtos(string filePath)
     {
         if (TryGetRecordsFromAbsoluteFilePath(filePath, out DtoContainer<DataBentoOhlcv>? records) && records != null)
         {
             output.WriteLine("Got records.");
-            return new([.. records.Dtos.Select(DataBentoConverter.ConvertOhlcv)]);
+            return new([.. records.Dtos.Select(DtoConverter.ConvertOhlcv)]);
         }
         else
         {

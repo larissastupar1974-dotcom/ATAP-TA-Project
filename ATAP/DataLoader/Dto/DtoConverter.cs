@@ -9,7 +9,7 @@ using DataLoader.Records;
 /// <summary>
 /// Convert from DataBento to standard schema.
 /// </summary>
-internal static class DataBentoConverter
+internal static class DtoConverter
 {
     /// <summary>
     /// Convert open high low close volume records.
@@ -31,6 +31,11 @@ internal static class DataBentoConverter
             Volume = ToDouble(dataBentoOhlcv.volume),
             Symbol = dataBentoOhlcv.symbol,
         };
+    }
+
+    public static BasicOhlcv ConvertOhlcv(Ohlcv ohlcv)
+    {
+        return new(ohlcv.TimeStamp, ohlcv.Open, ohlcv.High, ohlcv.Low, ohlcv.Close, ohlcv.Volume);
     }
 
     private static double? ToDoubleOrNull(string rawString)

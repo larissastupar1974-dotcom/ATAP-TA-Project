@@ -28,10 +28,11 @@ public class UnitTest1(ITestOutputHelper output)
     [Fact]
     public void TestWriteMovingAverageToCsv()
     {
-        TimeSeries<double> longest = new OhlcvTests(output).GetLongestTimeSeries();
-        TimeSeries<double> movingAverage = TimeSeriesUtilities.SimpleMovingAverage(longest, 20);
-        var multi = TimeSeriesUtilities.ToMultiSeries([longest, movingAverage]);
-        CsvReaderWriter.SaveToCSV<DataPoint<List<double?>>>(multi.Values, "C:\\MyData\\ma20.csv");
+        throw new NotFiniteNumberException();
+        //TimeSeries<double> longest = new OhlcvTests(output).GetLongestTimeSeries();
+        //TimeSeries<double> movingAverage = TimeSeriesUtilities.SimpleMovingAverage(longest, 20);
+        //var multi = TimeSeriesUtilities.ToMultiSeries([longest, movingAverage]);
+        //CsvReaderWriter.SaveToCSV<DataPoint<List<double?>>>(multi.Values, "C:\\MyData\\ma20.csv");
     }
 
     private TimeSeries<double> GetData()

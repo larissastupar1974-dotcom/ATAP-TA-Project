@@ -15,17 +15,30 @@ using System.Text;
 /// </summary>
 public static class CsvReaderWriter
 {
+    ///// <summary>
+    ///// Read from path to DataBentoOhlcv.
+    ///// </summary>
+    ///// <param name="path">File path.</param>
+    ///// <returns>Records.</returns>
+    //public static DtoContainer<DataBentoOhlcv> ReadDataBentoOhlcv(string path)
+    //{
+    //    using StreamReader reader = new(path);
+    //    using CsvReader csv = new(reader, CultureInfo.InvariantCulture);
+    //    IEnumerable<DataBentoOhlcv> records = csv.GetRecords<DataBentoOhlcv>();
+    //    return new([..records]);
+    //}
+
     /// <summary>
     /// Read from path to DataBentoOhlcv.
     /// </summary>
     /// <param name="path">File path.</param>
     /// <returns>Records.</returns>
-    public static DtoContainer<DataBentoOhlcv> ReadDataBentoOhlcv(string path)
+    public static DtoContainer<T> ReadData<T>(string path)
     {
         using StreamReader reader = new(path);
         using CsvReader csv = new(reader, CultureInfo.InvariantCulture);
-        IEnumerable<DataBentoOhlcv> records = csv.GetRecords<DataBentoOhlcv>();
-        return new([..records]);
+        IEnumerable<T> records = csv.GetRecords<T>();
+        return new([.. records]);
     }
 
     // Source - https://stackoverflow.com/a

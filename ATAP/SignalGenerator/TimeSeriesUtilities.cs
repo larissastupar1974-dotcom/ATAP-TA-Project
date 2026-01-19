@@ -27,7 +27,7 @@ public static class TimeSeriesUtilities
         return new TimeSeries<double>(timeSeries.Name + "_MovingAverage_" + window, movingAverage);
     }
 
-    public static TimeSeries<List<double?>> ToMultiSeries(List<TimeSeries<double>> listOfTimeSeries)
+    public static MultiTimeSeries<double?> ToMultiSeries(List<TimeSeries<double>> listOfTimeSeries)
     {
         List<IReadOnlyDictionary<DateTime, double>> asDictionaries = [.. listOfTimeSeries.Select(l => l.ToDictionary())];
         List<DateTime> allDates = [.. asDictionaries.SelectMany(d => d.Keys).Distinct().Order()];
@@ -41,6 +41,6 @@ public static class TimeSeriesUtilities
 
         List<string> listOfNames = [..listOfTimeSeries.Select(t => t.Name)];
         string multiName = string.Join(",", listOfNames);
-        return new(multiName, multiDataPoints);
+        return new (listOfNames, new(multiName, multiDataPoints));
     }
 }
